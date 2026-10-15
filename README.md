@@ -93,7 +93,7 @@ At most one ring toast per poll, and not sooner than 8 seconds after the previou
 | One plane, 5 or 10 miles | Plane within {ring} miles |
 | Several planes | {n} aircraft within {ring} mile or miles |
 
-The body names the callsign, type, distance, compass point, altitude, and speed when those exist. A group adds `{n} more inside the same ring.`
+The body names the callsign, type, compass point, distance, altitude, and speed when those exist. A plane to the southeast reads `LXJ328 (E545) is SE, 4.8 mi away, 17,425 ft`. A group adds `{n} more inside the same ring.`
 
 | Channel | Importance | When |
 | --- | --- | --- |

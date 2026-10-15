@@ -117,7 +117,7 @@ Copy, from `title_for` / `body_for`:
 - One plane, ring 1: title `Plane overhead`
 - One plane, ring 5 or 10: title `Plane within {ring} miles`
 - Group: title `{n} aircraft within {ring} mile` or `miles`
-- Body: `{callsign} ({type}) is {miles} {compass} away, {alt}, {speed} kt.` Type, altitude, and speed are omitted when missing. The compass point is the same eight-point bearing as the list. A group appends `{extra} more inside the same ring.`
+- Body: `{callsign} ({type}) is {compass}, {miles} away, {alt}, {speed} kt.` Type, altitude, and speed are omitted when missing. The compass point comes before the distance. A group appends `{extra} more inside the same ring.`
 
 Channels:
 

@@ -74,7 +74,7 @@ fun titleFor(event: AlertEvent): String {
 fun bodyFor(event: AlertEvent): String {
     val callsign = event.callsign.ifBlank { event.hex.ifBlank { "Aircraft" } }
     val label = if (event.type.isNotBlank()) "$callsign (${event.type})" else callsign
-    val parts = mutableListOf("$label is ${formatMiles(event.miles)} ${compassPoint(event.bearing)} away")
+    val parts = mutableListOf("$label is ${compassPoint(event.bearing)}, ${formatMiles(event.miles)} away")
     val alt = formatAlt(event.altFt, event.ground)
     if (alt.isNotEmpty()) parts += alt
     event.gsKt?.let { speed ->
