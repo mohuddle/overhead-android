@@ -45,7 +45,7 @@ data class PresentInput(
     val notifyDenied: Boolean,
 )
 
-private const val PLACEHOLDER = "72714, Santa Monica, or 34.05, -118.24"
+private const val PLACEHOLDER = "90401, Santa Monica, or 34.0195, -118.4912"
 
 fun present(input: PresentInput): ScreenState {
     val hasPlace = input.place != null

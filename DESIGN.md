@@ -60,7 +60,7 @@ One screen. Scaffold, limestone or ink background, center-aligned top bar titled
 Under the bar, in one scroll column:
 
 1. Status line. The feed error if there is one, otherwise the nearest line: `UAL2373 · 0.8 mi NE`, `No aircraft in range`, or `Set a location to watch the sky`. The compass point is the bearing from the stored place to the aircraft, in eight slices of 45° centered on N, NE, E, SE, S, SW, W, and NW. Accent while watching and there is a nearest plane. Place-field failures and a denied notification permission do not replace this line. They sit under the control that failed.
-2. Place field. Placeholder `72714, Santa Monica, or 34.05, -118.24`. **Set** geocodes the draft. **Device** asks for location permission and takes one fix. Device is always visible. It does not depend on a desktop GeoClue check.
+2. Place field. Placeholder `90401, Santa Monica, or 34.0195, -118.4912`. **Set** geocodes the draft. **Device** asks for location permission and takes one fix. Device is always visible. It does not depend on a desktop GeoClue check.
 3. Stored place, muted: the label, then the provider when a fetch has succeeded (`Fayetteville · adsb.fi`).
 4. Three ring chips, `1 mi`, `5 mi`, `10 mi`. A selected chip uses copper. The count for that ring is Geist Mono beside the label. Counts are cumulative, matching `_counts`: a plane at 0.4 mi increments 1, 5, and 10.
 5. **Watch** / **Stop**, and **Turn alerts off** / **Turn alerts on**. The label is the action of the next press. While alerts are on, the button uses the selected-chip colors: copper container, on-copper label. While alerts are off, it is an outlined button. **Clear** shows only when a place is stored. Clear drops the place, stops watching, and clears alert memory.

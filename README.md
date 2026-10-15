@@ -35,7 +35,7 @@ The globe is opened in the browser. The app does not embed it.
 One screen. The top bar says Overhead. The badge on the right says **Watching** or **Idle**.
 
 1. **Status.** The nearest aircraft (`UAL2373 · 0.8 mi NE`), `No aircraft in range`, or `Set a location to watch the sky`. The compass point is where that plane sits from the place you set: N, NE, E, SE, S, SW, W, or NW. While Watch is on and a plane is in the list, this line uses the sky accent. A feed failure replaces it with `ADS-B feeds failed (...)` and leaves the previous list up. A bad ZIP, a failed GPS fix, and a denied notification permission do not replace this line. Those sentences sit under the control that failed.
-2. **Place field.** Placeholder `72714, Santa Monica, or 34.05, -118.24`. **Set** stores what you typed. **Device** asks for location permission and takes one fix.
+2. **Place field.** Placeholder `90401, Santa Monica, or 34.0195, -118.4912`. **Set** stores what you typed. **Device** asks for location permission and takes one fix.
 3. **Stored place.** The label, then the feed that last returned aircraft (`Fayetteville · adsb.fi`).
 4. **Ring chips.** `1 mi`, `5 mi`, `10 mi`. A selected chip is copper. The number beside it is how many listed aircraft are inside that distance, and the counts stack: a plane at 0.4 mi counts for 1, 5, and 10. Turning the last ring off turns all three back on.
 5. **Watch / Stop** and **Turn alerts off / Turn alerts on.** The words are the action of the next press. While alerts are on, that button is copper, the same color as a selected distance chip. **Clear** appears only when a place is stored. Clear drops the place, stops Watch, and forgets which rings have already alerted. It leaves the ring selection and the alert switch as they were.

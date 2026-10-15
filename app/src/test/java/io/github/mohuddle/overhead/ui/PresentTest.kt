@@ -15,7 +15,7 @@ class PresentTest {
         assertEquals("Idle", state.badge)
         assertEquals("Set a location to watch the sky", state.statusLine)
         assertFalse(state.statusAccent)
-        assertEquals("72714, Santa Monica, or 34.05, -118.24", state.placeholder)
+        assertEquals("90401, Santa Monica, or 34.0195, -118.4912", state.placeholder)
         assertNull(state.placeLine)
         assertFalse(state.clearVisible)
         assertEquals("Set a location to list nearby flights.", state.emptyCopy)
