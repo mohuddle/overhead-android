@@ -17,11 +17,11 @@ Out of v1: an in-app map, a WebView of the globe, continuous GPS, background-loc
 
 - Package and namespace: `io.github.mohuddle.overhead`
 - App name: Overhead
-- Repo: `/home/anon/Work/overhead-android`
+- Repository: https://github.com/mohuddle/overhead-android
 - Kotlin, Jetpack Compose, Material 3. Dynamic color off.
 - `minSdk 29`, `compileSdk` / `targetSdk` 36
 - AGP 8.11.0, Kotlin 2.3.20, Compose BOM 2025.10.01, activity-compose 1.10.1, DataStore preferences 1.1.7
-- Java 17 via `compilerOptions { jvmTarget }` so Gradle does not provision a JDK. Build with `JAVA_HOME=/home/anon/.local/jdk-21` and `ANDROID_HOME=/home/anon/android-sdk`. Copy the Gradle 8.13 wrapper from `battery-charge-alarm`.
+- Java 17 via `compilerOptions { jvmTarget }` so Gradle does not provision a JDK. The Gradle 8.13 wrapper is in the repository. Build with JDK 17 or newer and an Android SDK that has platform 36.
 - Sideload APK. No signing config in Gradle for v1.
 - MIT for app code. Carry `NOTICE.md` from the plugin, rewritten for the Android paths.
 - Domain code is a JVM port of `overhead/geo.py`, `overhead/ads.py` (normalize and filter), `overhead/alerts.py`, and the status strings in `Model.js`. No Android imports in that code. `tests/test_overhead.py` and `tests/model.test.js` are the oracle. Desktop socket, path, and `notify-send` tests are not ported.
@@ -47,9 +47,9 @@ Same studio frame as ChargeAlert and Aftercast.
 | Sky ink | `#0E2A5C` | Text on sky mist |
 | Sky mist | `#D6E4FB` | Light primary container |
 
-Sky is primary. Copper is secondary. ChargeAlert's green scale is the template: light primary is Sky deep on limestone, dark primary is Sky bright on ink. Titles are Geist, labels are Geist Mono, body is Inter. Copy the font files and the SIL OFL notices from `battery-charge-alarm`.
+Sky is primary. Copper is secondary. The light primary is Sky deep on limestone, and the dark primary is Sky bright on ink. Titles are Geist, labels are Geist Mono, body is Inter. The font files are in `app/src/main/res/font/`. The SIL OFL notices are in `app/src/main/assets/`.
 
-Sky marks the watching badge, the nearest line while watching, and any row inside 1 mile. Copper is the secondary accent on Set and on a selected ring. Everything else stays ink, limestone, and concrete.
+Sky marks the watching badge, the nearest line while watching, and any row inside 1 mile. Selected ring chips use copper. Set uses the primary filled button. Everything else stays ink, limestone, and concrete.
 
 The launcher is a sky squircle with the plugin's Cessna silhouette (`icon.svg`, from [adsb-radar.com/help/icons/cessna.svg](https://adsb-radar.com/help/icons/cessna.svg)). Monochrome layer is the same glyph in white. Materialize it the way ChargeAlert does: SVG in `branding/`, `scripts/materialize_icons.py`, adaptive icon layers. The notification small icon is a white Cessna vector, tinted Sky.
 
@@ -81,6 +81,8 @@ Anything else goes to OpenStreetMap Nominatim once, when Set is pressed. A US ZI
 ## Sky
 
 While Watch is on and a place is stored, a foreground service polls every 12 seconds. The service type is `dataSync`. There is no battery-optimization prompt.
+
+On Android 15 and later, a background `dataSync` service is limited to about six hours in a rolling day. When that limit hits, the service stops, Watch is set off, and the status line becomes `Watch stopped. Android limits how long this can run in the background.` The place, rings, and Notify switch stay. Turning Watch on again the same day can hit the same limit. Opening the app resumes Watch when a place is already stored.
 
 Fetch order, stopping at the first feed that returns aircraft:
 
@@ -175,6 +177,6 @@ Feed HTTP and Nominatim are not called from unit tests. A fake client covers pro
 
 The stored place stays in the app's DataStore. A poll sends that lat/lon and a radius to adsb.fi, adsb.lol, or OpenSky. Nominatim receives the typed query only when Set is pressed. The globe URL runs only when a row or a single-plane notification is tapped, and the only identifier in it is the hex. There is no account, no analytics, and no IP geolocation.
 
-## Build order
+## Status
 
-The implementation plan splits this into slices. The order is scaffold and theme, domain plus the tests above, DataStore, the screen against a fake status, geocoding and feeds, the foreground service and notifications, the Device fix, boot resume, then the launcher, `NOTICE.md`, and `README.md`.
+v1 of this spec is implemented. The slice order was scaffold and theme, domain plus the tests above, DataStore, the screen against a fake status, geocoding and feeds, the foreground service and notifications, the Device fix, boot resume, then the launcher, `NOTICE.md`, and `README.md`. The working notes for that order are in `docs/superpowers/plans/2026-10-14-overhead-android.md`.
