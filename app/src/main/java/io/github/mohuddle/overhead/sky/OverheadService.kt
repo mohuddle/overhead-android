@@ -21,6 +21,7 @@ import io.github.mohuddle.overhead.R
 import io.github.mohuddle.overhead.domain.AlertEvent
 import io.github.mohuddle.overhead.domain.bodyFor
 import io.github.mohuddle.overhead.domain.fetchWith
+import io.github.mohuddle.overhead.domain.shouldKeepPoll
 import io.github.mohuddle.overhead.domain.shouldRunService
 import io.github.mohuddle.overhead.domain.titleFor
 import java.util.concurrent.atomic.AtomicBoolean
@@ -31,14 +32,27 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 private const val POLL_MS = 12_000L
 private const val WATCH_NOTIFICATION_ID = 1
 private const val ALERT_NOTIFICATION_ID = 2
 
+private enum class Tick { Continue, Retry, Stop }
+
 class OverheadService : LifecycleService() {
     private val loopStarted = AtomicBoolean(false)
+    private val timingOut = AtomicBoolean(false)
     private var lastToastAt = 0L
+
+    override fun onTimeout(startId: Int, fgsType: Int) {
+        endBecauseTimedOut()
+    }
+
+    @Suppress("OVERRIDE_DEPRECATION")
+    override fun onTimeout(startId: Int) {
+        endBecauseTimedOut()
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -66,25 +80,43 @@ class OverheadService : LifecycleService() {
         return START_STICKY
     }
 
-    private suspend fun loop() {
-        while (currentCoroutineContext().isActive) {
-            val keepGoing = try {
-                tick()
-            } catch (error: Exception) {
-                if (error is CancellationException) throw error
-                true
+    private fun endBecauseTimedOut() {
+        if (!timingOut.compareAndSet(false, true)) return
+        SkyHolder.publish(skyAfterTimeout(SkyHolder.sky.value))
+        try {
+            runBlocking(Dispatchers.IO) {
+                val store = (application as OverheadApp).store
+                store.setWatch(afterWatchDismissed(store.config.first()).watch)
             }
-            if (!keepGoing) break
-            delay(POLL_MS)
+        } catch (_: Exception) {
+            // The notice still stops. A later launch reads whatever was saved.
         }
         stopSelf()
     }
 
-    private suspend fun tick(): Boolean {
+    private suspend fun loop() {
+        while (currentCoroutineContext().isActive) {
+            val step = try {
+                tick()
+            } catch (error: Exception) {
+                if (error is CancellationException) throw error
+                Tick.Continue
+            }
+            when (step) {
+                Tick.Stop -> break
+                Tick.Retry -> Unit
+                Tick.Continue -> delay(POLL_MS)
+            }
+        }
+        stopSelf()
+    }
+
+    private suspend fun tick(): Tick {
+        if (timingOut.get()) return Tick.Stop
         val store = (application as OverheadApp).store
         val config = store.config.first()
         val place = config.place
-        if (!shouldRunService(config.watch, place) || place == null) return false
+        if (!shouldRunService(config.watch, place) || place == null) return Tick.Stop
         val now = System.currentTimeMillis()
         val since = if (lastToastAt == 0L) 8.0 else (now - lastToastAt) / 1000.0
         val result = poll(
@@ -97,14 +129,22 @@ class OverheadService : LifecycleService() {
             nowEpochMs = now,
             fetch = { here, rings -> fetchWith(::httpGet, here.lat, here.lon, rings) },
         )
+        if (timingOut.get()) return Tick.Stop
+        val latest = store.config.first()
+        if (!shouldKeepPoll(place, latest.place, latest.watch)) {
+            return if (shouldRunService(latest.watch, latest.place)) Tick.Retry else Tick.Stop
+        }
         SkyHolder.publish(result.sky)
-        if (result.alerted != config.alerted) store.setAlerted(result.alerted)
+        val allowed = notificationsAllowed()
         val toast = result.toast
-        if (toast != null && notificationsAllowed()) {
+        if (toast != null && allowed) {
             postToast(toast)
             lastToastAt = now
         }
-        return true
+        if (shouldPersistAlerted(toast, allowed) && result.alerted != latest.alerted) {
+            store.setAlerted(result.alerted)
+        }
+        return Tick.Continue
     }
 
     private fun notificationsAllowed(): Boolean {

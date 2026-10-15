@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.github.mohuddle.overhead.sky.notificationsDenied
 import io.github.mohuddle.overhead.ui.OverheadScreen
 import io.github.mohuddle.overhead.ui.OverheadViewModel
 import io.github.mohuddle.overhead.ui.theme.OverheadTheme
@@ -40,6 +41,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         model = ViewModelProvider(this)[OverheadViewModel::class.java]
+        model.setNotifyDenied(
+            notificationsDenied(
+                Build.VERSION.SDK_INT,
+                granted(Manifest.permission.POST_NOTIFICATIONS),
+            ),
+        )
         setContent {
             OverheadTheme {
                 var draft by rememberSaveable { mutableStateOf("") }
@@ -80,19 +87,12 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun askNotifications() {
-        if (Build.VERSION.SDK_INT < 33) {
-            model.setNotifyDenied(false)
-            return
-        }
-        val granted = ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.POST_NOTIFICATIONS,
-        ) == PackageManager.PERMISSION_GRANTED
-        if (granted) {
-            model.setNotifyDenied(false)
-        } else {
-            notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
-        }
+        val denied = notificationsDenied(
+            Build.VERSION.SDK_INT,
+            granted(Manifest.permission.POST_NOTIFICATIONS),
+        )
+        model.setNotifyDenied(denied)
+        if (denied) notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
 
     private fun openRow(url: String) {

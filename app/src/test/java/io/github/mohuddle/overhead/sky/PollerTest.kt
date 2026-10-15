@@ -3,6 +3,8 @@ package io.github.mohuddle.overhead.sky
 import io.github.mohuddle.overhead.domain.Aircraft
 import io.github.mohuddle.overhead.domain.FeedChoice
 import io.github.mohuddle.overhead.domain.Place
+import io.github.mohuddle.overhead.domain.resumesOnColdStart
+import io.github.mohuddle.overhead.domain.shouldKeepPoll
 import io.github.mohuddle.overhead.domain.shouldRunService
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -13,6 +15,20 @@ import org.junit.Test
 class PollerTest {
     private val rings = listOf(1, 5, 10)
     private val now = 1_700_000_000_000L
+
+    @Test fun stalePollIsDroppedWhenThePlaceMoved() {
+        val started = place()
+        assertTrue(shouldKeepPoll(started, started, watch = true))
+        assertFalse(shouldKeepPoll(started, started.copy(lat = started.lat + 1.0), watch = true))
+        assertFalse(shouldKeepPoll(started, null, watch = true))
+        assertFalse(shouldKeepPoll(started, started, watch = false))
+    }
+
+    @Test fun coldStartResumesAWatchingPlace() {
+        assertTrue(resumesOnColdStart(true, place()))
+        assertFalse(resumesOnColdStart(true, null))
+        assertFalse(resumesOnColdStart(false, place()))
+    }
 
     @Test fun serviceRunsOnlyWithWatchAndPlace() {
         assertFalse(shouldRunService(true, null))

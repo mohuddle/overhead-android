@@ -29,6 +29,15 @@ fun alertOpen(event: AlertEvent): AlertOpen {
 }
 
 const val WATCH_TITLE = "Overhead is watching"
+const val WATCH_TIMEOUT = "Watch stopped. Android limits how long this can run in the background."
 const val STOP_WATCH = "io.github.mohuddle.overhead.action.STOP_WATCH"
+
+fun shouldPersistAlerted(toast: AlertEvent?, notificationsAllowed: Boolean): Boolean {
+    return toast == null || notificationsAllowed
+}
+
+fun notificationsDenied(sdkInt: Int, granted: Boolean): Boolean = sdkInt >= 33 && !granted
+
+fun skyAfterTimeout(sky: SkyState): SkyState = sky.copy(error = WATCH_TIMEOUT)
 
 fun afterWatchDismissed(config: OverheadConfig): OverheadConfig = config.copy(watch = false)

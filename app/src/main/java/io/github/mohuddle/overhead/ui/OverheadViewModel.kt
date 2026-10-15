@@ -7,11 +7,13 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.mohuddle.overhead.OverheadApp
+import io.github.mohuddle.overhead.domain.Place
 import io.github.mohuddle.overhead.domain.SetQuery
 import io.github.mohuddle.overhead.domain.USER_AGENT
 import io.github.mohuddle.overhead.domain.classifySet
 import io.github.mohuddle.overhead.domain.noMatchMessage
 import io.github.mohuddle.overhead.domain.placeFromNominatim
+import io.github.mohuddle.overhead.domain.resumesOnColdStart
 import io.github.mohuddle.overhead.domain.shouldRunService
 import io.github.mohuddle.overhead.domain.summarizeCounts
 import io.github.mohuddle.overhead.sky.DEVICE_DENIED
@@ -67,13 +69,22 @@ class OverheadViewModel(app: Application) : AndroidViewModel(app) {
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), idleScreen())
 
+    init {
+        viewModelScope.launch {
+            val config = store.config.first()
+            if (resumesOnColdStart(config.watch, config.place)) {
+                val context = getApplication<Application>()
+                ContextCompat.startForegroundService(context, Intent(context, OverheadService::class.java))
+            }
+        }
+    }
+
     fun set(text: String) {
         viewModelScope.launch {
             when (val query = classifySet(text)) {
                 is SetQuery.Manual -> {
                     placeError.value = null
-                    store.setPlace(query.place)
-                    syncService()
+                    storePlace(query.place)
                 }
                 is SetQuery.Rejected -> {
                     placeError.value = query.message
@@ -83,8 +94,7 @@ class OverheadViewModel(app: Application) : AndroidViewModel(app) {
                         val body = withContext(Dispatchers.IO) { httpGet(query.url, USER_AGENT) }
                         val place = placeFromNominatim(text.trim(), body)
                         placeError.value = null
-                        store.setPlace(place)
-                        syncService()
+                        storePlace(place)
                     } catch (error: Exception) {
                         placeError.value = error.message?.takeIf { it.isNotBlank() }
                             ?: noMatchMessage(text.trim())
@@ -149,13 +159,20 @@ class OverheadViewModel(app: Application) : AndroidViewModel(app) {
                 return@launch
             }
             val accuracy = if (fix.hasAccuracy()) fix.accuracy.toDouble() else null
-            store.setPlace(devicePlace(fix.latitude, fix.longitude, accuracy))
-            syncService()
+            storePlace(devicePlace(fix.latitude, fix.longitude, accuracy))
         }
     }
 
     fun denyDevice() {
         deviceError.value = DEVICE_DENIED
+    }
+
+    private suspend fun storePlace(place: Place) {
+        val previous = store.config.first().place
+        val moved = previous == null || previous.lat != place.lat || previous.lon != place.lon
+        store.setPlace(place)
+        if (moved) SkyHolder.publish(emptySky())
+        syncService()
     }
 
     private suspend fun syncService() {

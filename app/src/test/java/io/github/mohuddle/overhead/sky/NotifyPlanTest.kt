@@ -29,6 +29,31 @@ class NotifyPlanTest {
         assertEquals(AlertOpen.App, alertOpen(event(extra = 2)))
     }
 
+    @Test fun deniedPermissionDoesNotSpendTheRing() {
+        val toast = event(extra = 0)
+        assertFalse(shouldPersistAlerted(toast, notificationsAllowed = false))
+        assertTrue(shouldPersistAlerted(toast, notificationsAllowed = true))
+        assertTrue(shouldPersistAlerted(null, notificationsAllowed = false))
+    }
+
+    @Test fun notificationLineFollowsThePermission() {
+        assertTrue(notificationsDenied(33, granted = false))
+        assertFalse(notificationsDenied(33, granted = true))
+        assertFalse(notificationsDenied(29, granted = false))
+    }
+
+    @Test fun timeoutKeepsTheListAndSaysWhy() {
+        val sky = emptySky().copy(lastSuccessProvider = "adsb.fi", lastSuccessEpochMs = 50)
+        val next = skyAfterTimeout(sky)
+        assertEquals(WATCH_TIMEOUT, next.error)
+        assertEquals("adsb.fi", next.lastSuccessProvider)
+        assertEquals(50L, next.lastSuccessEpochMs)
+        assertEquals(
+            "Watch stopped. Android limits how long this can run in the background.",
+            WATCH_TIMEOUT,
+        )
+    }
+
     @Test fun watchTitle() {
         assertEquals("Overhead is watching", WATCH_TITLE)
     }
