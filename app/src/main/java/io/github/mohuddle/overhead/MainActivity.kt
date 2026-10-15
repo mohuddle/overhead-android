@@ -3,31 +3,49 @@ package io.github.mohuddle.overhead
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import io.github.mohuddle.overhead.ui.OverheadScreen
+import io.github.mohuddle.overhead.ui.PresentInput
+import io.github.mohuddle.overhead.ui.present
 import io.github.mohuddle.overhead.ui.theme.OverheadTheme
 
 class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             OverheadTheme {
-                Scaffold(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    topBar = {
-                        CenterAlignedTopAppBar(title = { Text("Overhead") })
-                    },
-                ) { padding ->
-                    Spacer(Modifier.fillMaxSize().padding(padding))
-                }
+                var draft by rememberSaveable { mutableStateOf("") }
+                val state = present(
+                    PresentInput(
+                        place = null,
+                        rings = listOf(1, 5, 10),
+                        notify = true,
+                        watch = false,
+                        aircraft = emptyList(),
+                        error = "",
+                        counts = emptyMap(),
+                        lastSuccessProvider = "",
+                        timeLabel = null,
+                        placeError = null,
+                        deviceError = null,
+                        notifyDenied = false,
+                    ),
+                )
+                OverheadScreen(
+                    state = state,
+                    draft = draft,
+                    onDraft = { draft = it },
+                    onSet = {},
+                    onDevice = {},
+                    onWatch = {},
+                    onNotify = {},
+                    onClear = {},
+                    onRing = {},
+                    onRow = {},
+                )
             }
         }
     }
