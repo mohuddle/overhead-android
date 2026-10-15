@@ -37,6 +37,22 @@ class GeoTest {
         assertEquals("12 mi", formatMiles(12.4))
     }
 
+    @Test fun compassPoints() {
+        assertEquals("N", compassPoint(0.0))
+        assertEquals("N", compassPoint(22.4))
+        assertEquals("NE", compassPoint(22.5))
+        assertEquals("E", compassPoint(90.0))
+        assertEquals("SE", compassPoint(135.0))
+        assertEquals("S", compassPoint(180.0))
+        assertEquals("SW", compassPoint(225.0))
+        assertEquals("W", compassPoint(270.0))
+        assertEquals("NW", compassPoint(315.0))
+        assertEquals("NW", compassPoint(337.4))
+        assertEquals("N", compassPoint(337.5))
+        assertEquals("N", compassPoint(359.9))
+        assertEquals("N", compassPoint(-22.5))
+    }
+
     @Test fun normalizeRingsDropsUnknownAndRestoresEmpty() {
         assertEquals(listOf(5, 1), normalizeRings(listOf(5, 5, 2, 1)))
         assertEquals(listOf(1, 5, 10), normalizeRings(emptyList()))
@@ -94,7 +110,7 @@ class GeoTest {
 
     @Test fun userAgent() {
         assertEquals(
-            "overhead-android/0.1.0 (personal ADS-B watcher; https://github.com/mohuddle/overhead-android)",
+            "overhead-android/0.2.0 (personal ADS-B watcher; https://github.com/mohuddle/overhead-android)",
             USER_AGENT,
         )
     }

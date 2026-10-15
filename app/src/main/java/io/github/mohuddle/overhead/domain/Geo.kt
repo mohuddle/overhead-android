@@ -4,6 +4,7 @@ import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.asin
 import kotlin.math.cos
+import kotlin.math.floor
 import kotlin.math.min
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -82,3 +83,11 @@ fun normalizeRings(value: List<Int>?): List<Int> {
 }
 
 fun isUsZip(text: String): Boolean = US_ZIP.matches(text)
+
+private val COMPASS_POINTS = arrayOf("N", "NE", "E", "SE", "S", "SW", "W", "NW")
+
+fun compassPoint(bearing: Double): String {
+    val normalized = ((bearing % 360.0) + 360.0) % 360.0
+    val index = floor((normalized + 22.5) / 45.0).toInt() % 8
+    return COMPASS_POINTS[index]
+}

@@ -34,12 +34,12 @@ The globe is opened in the browser. The app does not embed it.
 
 One screen. The top bar says Overhead. The badge on the right says **Watching** or **Idle**.
 
-1. **Status.** The nearest aircraft (`UAL2373 · 0.8 mi`), `No aircraft in range`, or `Set a location to watch the sky`. While Watch is on and a plane is in the list, this line uses the sky accent. A feed failure replaces it with `ADS-B feeds failed (...)` and leaves the previous list up. A bad ZIP, a failed GPS fix, and a denied notification permission do not replace this line. Those sentences sit under the control that failed.
+1. **Status.** The nearest aircraft (`UAL2373 · 0.8 mi NE`), `No aircraft in range`, or `Set a location to watch the sky`. The compass point is where that plane sits from the place you set: N, NE, E, SE, S, SW, W, or NW. While Watch is on and a plane is in the list, this line uses the sky accent. A feed failure replaces it with `ADS-B feeds failed (...)` and leaves the previous list up. A bad ZIP, a failed GPS fix, and a denied notification permission do not replace this line. Those sentences sit under the control that failed.
 2. **Place field.** Placeholder `72714, Santa Monica, or 34.05, -118.24`. **Set** stores what you typed. **Device** asks for location permission and takes one fix.
 3. **Stored place.** The label, then the feed that last returned aircraft (`Fayetteville · adsb.fi`).
 4. **Ring chips.** `1 mi`, `5 mi`, `10 mi`. A selected chip is copper. The number beside it is how many listed aircraft are inside that distance, and the counts stack: a plane at 0.4 mi counts for 1, 5, and 10. Turning the last ring off turns all three back on.
-5. **Watch / Stop** and **Notify on / Notify off.** **Clear** appears only when a place is stored. Clear drops the place, stops Watch, and forgets which rings have already alerted. It leaves the ring selection and the Notify switch as they were.
-6. **Aircraft list.** Each row is distance, callsign, type, and altitude, for example `0.8 mi  UAL2373  B39M  4,200 ft`. A row at 1.0 mile or closer is sky and opens the globe. Other rows open the globe too. Ground aircraft stay in the list, with altitude `ground`. Empty copy is `Set a location to list nearby flights.` or `No aircraft in range.`
+5. **Watch / Stop** and **Turn alerts off / Turn alerts on.** The words are the action of the next press. While alerts are on, that button is copper, the same color as a selected distance chip. **Clear** appears only when a place is stored. Clear drops the place, stops Watch, and forgets which rings have already alerted. It leaves the ring selection and the alert switch as they were.
+6. **Aircraft list.** Each row is distance, direction, callsign, type, and altitude, for example `0.8 mi NE  UAL2373  B39M  4,200 ft`. A row at 1.0 mile or closer is sky and opens the globe. Other rows open the globe too. Ground aircraft stay in the list, with altitude `ground`. Empty copy is `Set a location to list nearby flights.` or `No aircraft in range.`
 
 Under the list, a caption names the feed and the local time of the last successful fetch.
 
@@ -59,7 +59,7 @@ Anything else is sent to OpenStreetMap Nominatim once, when you press Set. A US 
 
 ## Watch
 
-While Watch is on and a place is stored, a foreground service polls every 12 seconds. The ongoing notification is titled **Overhead is watching**. Tapping it opens the app. Dismissing it turns Watch off and stops the service.
+While Watch is on and a place is stored, a foreground service polls every 30 seconds. The ongoing notification is titled **Overhead is watching**. Tapping it opens the app. Dismissing it turns Watch off and stops the service.
 
 Fetch order, stopping at the first feed that still has aircraft after filtering:
 
@@ -93,7 +93,7 @@ At most one ring toast per poll, and not sooner than 8 seconds after the previou
 | One plane, 5 or 10 miles | Plane within {ring} miles |
 | Several planes | {n} aircraft within {ring} mile or miles |
 
-The body names the callsign, type, distance, altitude, and speed when those exist. A group adds `{n} more inside the same ring.`
+The body names the callsign, type, distance, compass point, altitude, and speed when those exist. A group adds `{n} more inside the same ring.`
 
 | Channel | Importance | When |
 | --- | --- | --- |
@@ -102,7 +102,7 @@ The body names the callsign, type, distance, altitude, and speed when those exis
 | `overhead-5` | default | 5 mile ring |
 | `overhead-10` | low | 10 mile ring |
 
-Notification permission is requested when you turn Watch on or turn Notify on. If you deny it, Watch still runs, ring toasts are skipped, and **Notify** shows `Notifications are off.` The app reads that permission again on launch. A ring that could not be posted because permission is off is not stored, so granting notifications later can still announce a plane that is inside a ring. Turning Notify off is different: the ring is stored, and turning Notify back on does not announce a plane that is still inside it.
+Notification permission is requested when you turn Watch on or turn alerts on. If you deny it, Watch still runs, ring toasts are skipped, and a line under the alert button says `Notifications are off.` The app reads that permission again on launch. A ring that could not be posted because permission is off is not stored, so granting notifications later can still announce a plane that is inside a ring. Turning alerts off is different: the ring is stored, and turning alerts back on does not announce a plane that is still inside it.
 
 ## Permissions
 
@@ -110,7 +110,7 @@ Notification permission is requested when you turn Watch on or turn Notify on. I
 | --- | --- |
 | Internet | ADS-B feeds and, only when you press Set, Nominatim |
 | Notifications | The watching notice and ring toasts |
-| Foreground service (`dataSync`) | The 12 second poll while Watch is on |
+| Foreground service (`dataSync`) | The 30 second poll while Watch is on |
 | Fine and coarse location | The Device button only |
 | Boot completed | Resume Watch after reboot when a place is saved |
 
@@ -120,7 +120,7 @@ There is no background-location permission.
 
 The stored place stays in the app's DataStore. A poll sends that lat/lon and a radius to adsb.fi, adsb.lol, or OpenSky. Nominatim receives the typed query only when Set is pressed. The globe URL runs only when a row or a single-plane notification is tapped, and the only identifier in it is the hex. There is no account, no analytics, and no IP geolocation.
 
-The User-Agent on those requests is `overhead-android/0.1.0 (personal ADS-B watcher; https://github.com/mohuddle/overhead-android)`.
+The User-Agent on those requests is `overhead-android/0.2.0 (personal ADS-B watcher; https://github.com/mohuddle/overhead-android)`.
 
 Android backup is left at the platform default, so a device backup can include the preferences file that holds the place.
 
@@ -136,7 +136,7 @@ cd overhead-android
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
-`minSdk` is 29 (Android 10). `compileSdk` and `targetSdk` are 36. Version 0.1.0, version code 1. Unit tests cover the distance, place, feed, alert, screen, and poll rules. They do not call the live feeds or Nominatim.
+`minSdk` is 29 (Android 10). `compileSdk` and `targetSdk` are 36. Version 0.2.0, version code 2. Unit tests cover the distance, place, feed, alert, screen, and poll rules. They do not call the live feeds or Nominatim.
 
 The debug APK is signed with the local debug key. There is no release signing config in Gradle.
 
@@ -153,7 +153,7 @@ The debug APK is signed with the local debug key. There is no release signing co
 | Live list | Memory only. Process death reloads the place and refetches. It does not invent a list. |
 | Domain | `domain/Geo.kt`, `PlaceQuery.kt`, `Aircraft.kt`, `Alerts.kt`, `Feeds.kt`, `Watch.kt` |
 | Screen | `ui/Present.kt`, `ui/OverheadScreen.kt` |
-| Service | `sky/OverheadService.kt`, poll every 12 seconds |
+| Service | `sky/OverheadService.kt`, poll every 30 seconds |
 | Desktop oracle | plugin `overhead/*.py`, `Model.js`, and their tests |
 
 Ink `#12141B`, limestone `#F4F2ED`, copper `#EE9A5B` / `#D9783A`, sky `#2F6FE4`. Titles are Geist, counts are Geist Mono, body is Inter. The launcher is the same Mobitecture mark as the desktop repo: a sky squircle, the side-view plane, and a copper wing light (`branding/overhead-icon-vibrant.svg`).

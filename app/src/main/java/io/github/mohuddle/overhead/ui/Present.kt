@@ -20,6 +20,7 @@ data class ScreenState(
     val rings: List<RingChip>,
     val watchLabel: String,
     val notifyLabel: String,
+    val notifyOn: Boolean,
     val clearVisible: Boolean,
     val emptyCopy: String?,
     val rows: List<PlaneRow>,
@@ -83,7 +84,8 @@ fun present(input: PresentInput): ScreenState {
             RingChip(ring, "$ring mi", input.counts[ring.toString()] ?: 0, ring in input.rings)
         },
         watchLabel = if (input.watch) "Stop" else "Watch",
-        notifyLabel = if (input.notify) "Notify on" else "Notify off",
+        notifyLabel = if (input.notify) "Turn alerts off" else "Turn alerts on",
+        notifyOn = input.notify,
         clearVisible = hasPlace,
         emptyCopy = when {
             rows.isNotEmpty() -> null

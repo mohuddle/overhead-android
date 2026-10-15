@@ -1,5 +1,7 @@
 package io.github.mohuddle.overhead.domain
 
+const val POLL_INTERVAL_MS = 30_000L
+
 fun shouldRunService(watch: Boolean, place: Place?): Boolean = watch && place != null
 
 fun resumesOnColdStart(watch: Boolean, place: Place?): Boolean = shouldRunService(watch, place)

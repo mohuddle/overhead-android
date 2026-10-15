@@ -59,28 +59,28 @@ One screen. Scaffold, limestone or ink background, center-aligned top bar titled
 
 Under the bar, in one scroll column:
 
-1. Status line. The feed error if there is one, otherwise the nearest line from `Model.js`: `UAL2373 · 0.8 mi`, `No aircraft in range`, or `Set a location to watch the sky`. Accent while watching and there is a nearest plane. Place-field failures and a denied notification permission do not replace this line. They sit under the control that failed.
+1. Status line. The feed error if there is one, otherwise the nearest line: `UAL2373 · 0.8 mi NE`, `No aircraft in range`, or `Set a location to watch the sky`. The compass point is the bearing from the stored place to the aircraft, in eight slices of 45° centered on N, NE, E, SE, S, SW, W, and NW. Accent while watching and there is a nearest plane. Place-field failures and a denied notification permission do not replace this line. They sit under the control that failed.
 2. Place field. Placeholder `72714, Santa Monica, or 34.05, -118.24`. **Set** geocodes the draft. **Device** asks for location permission and takes one fix. Device is always visible. It does not depend on a desktop GeoClue check.
 3. Stored place, muted: the label, then the provider when a fetch has succeeded (`Fayetteville · adsb.fi`).
 4. Three ring chips, `1 mi`, `5 mi`, `10 mi`. A selected chip uses copper. The count for that ring is Geist Mono beside the label. Counts are cumulative, matching `_counts`: a plane at 0.4 mi increments 1, 5, and 10.
-5. **Watch** / **Stop**, and **Notify on** / **Notify off**. **Clear** shows only when a place is stored. Clear drops the place, stops watching, and clears alert memory.
-6. Aircraft list. Empty copy: `Set a location to list nearby flights.` or `No aircraft in range.` A row is `0.8 mi  UAL2373  B39M  4,200 ft`, the same pieces as `aircraftLine`. Ground is the altitude word when the row is on the ground. A row inside 1 mile is Sky. Tap opens the globe URL. The list does not embed the site.
+5. **Watch** / **Stop**, and **Turn alerts off** / **Turn alerts on**. The label is the action of the next press. While alerts are on, the button uses the selected-chip colors: copper container, on-copper label. While alerts are off, it is an outlined button. **Clear** shows only when a place is stored. Clear drops the place, stops watching, and clears alert memory.
+6. Aircraft list. Empty copy: `Set a location to list nearby flights.` or `No aircraft in range.` A row is `0.8 mi NE  UAL2373  B39M  4,200 ft`, the same pieces as `aircraftLine`. Ground is the altitude word when the row is on the ground. A row inside 1 mile is Sky. Tap opens the globe URL. The list does not embed the site.
 
 A caption under the list shows the provider and the local time of the last successful fetch.
 
 ## Location
 
-First launch has no place, Watch off, Notify on, all three rings on. Nothing is fetched.
+First launch has no place, Watch off, alerts on, all three rings on. Nothing is fetched.
 
 **Set** parses coordinates locally with the desktop rules (`34.05, -118.24`, `34.05 N 118.24 W`, a Google Maps `@lat,lon` URL). A parsed pair is stored with source `manual` and a four-decimal label. It is not sent to a geocoder. `0, 0` is invalid. A leading `--` is rejected with `enter a ZIP, city, or coordinates`.
 
-Anything else goes to OpenStreetMap Nominatim once, when Set is pressed. A US ZIP (`^\d{5}(?:-\d{4})?$`) is `postalcode` plus `country=us`, using the first five digits. Any other text is `q`. Limit 1, `format=jsonv2`. No match: `no match for {query}. Try a ZIP, city, or lat, lon.` User-Agent: `overhead-android/0.1.0 (personal ADS-B watcher; https://github.com/mohuddle/overhead-android)`.
+Anything else goes to OpenStreetMap Nominatim once, when Set is pressed. A US ZIP (`^\d{5}(?:-\d{4})?$`) is `postalcode` plus `country=us`, using the first five digits. Any other text is `q`. Limit 1, `format=jsonv2`. No match: `no match for {query}. Try a ZIP, city, or lat, lon.` User-Agent: `overhead-android/0.2.0 (personal ADS-B watcher; https://github.com/mohuddle/overhead-android)`.
 
 **Device** requests `ACCESS_FINE_LOCATION` and `ACCESS_COARSE_LOCATION` from that tap. Denial leaves the stored place as it was and shows `Location permission is off. A ZIP or city works too.` under the Device button. A grant takes one `LocationManager` fix (fused provider on API 31+, otherwise GPS). The fix is stored with source `device`, the four-decimal coordinates as the label, and `accuracy_m`. Ten seconds with no fix shows `Couldn't read a device location.` under that button. A Nominatim miss shows its sentence under Set. Watching does not subscribe to location updates and does not request `ACCESS_BACKGROUND_LOCATION`.
 
 ## Sky
 
-While Watch is on and a place is stored, a foreground service polls every 12 seconds. The service type is `dataSync`. There is no battery-optimization prompt.
+While Watch is on and a place is stored, a foreground service polls every 30 seconds. The service type is `dataSync`. There is no battery-optimization prompt. A fast pass through the 1-mile ring can fall between polls.
 
 On Android 15 and later, a background `dataSync` service is limited to about six hours in a rolling day. When that limit hits, the service stops, Watch is set off, and the status line becomes `Watch stopped. Android limits how long this can run in the background.` The place, rings, and Notify switch stay. Turning Watch on again the same day can hit the same limit. Opening the app resumes Watch when a place is already stored.
 
@@ -117,7 +117,7 @@ Copy, from `title_for` / `body_for`:
 - One plane, ring 1: title `Plane overhead`
 - One plane, ring 5 or 10: title `Plane within {ring} miles`
 - Group: title `{n} aircraft within {ring} mile` or `miles`
-- Body: `{callsign} ({type}) is {miles} away, {alt}, {speed} kt.` Type, altitude, and speed are omitted when missing. A group appends `{extra} more inside the same ring.`
+- Body: `{callsign} ({type}) is {miles} {compass} away, {alt}, {speed} kt.` Type, altitude, and speed are omitted when missing. The compass point is the same eight-point bearing as the list. A group appends `{extra} more inside the same ring.`
 
 Channels:
 
@@ -130,7 +130,7 @@ Channels:
 
 The ongoing notice is titled `Overhead is watching`. Tapping it opens the app. Dismissing it sets Watch off and stops the service. Tapping a single-plane alert opens that plane's globe URL. Tapping a grouped alert opens the app.
 
-`POST_NOTIFICATIONS` is requested when the user turns Watch on, or turns Notify on. If they deny it, Watch still runs, ring toasts are skipped, and a line under the Notify control says `Notifications are off.` The app reads that permission again on launch. A ring that could not be posted because permission is off is not stored, so granting notifications later can still announce a plane that is inside the ring. The 8 second gap still stores the ring.
+`POST_NOTIFICATIONS` is requested when the user turns Watch on, or turns alerts on. If they deny it, Watch still runs, ring toasts are skipped, and a line under the alert button says `Notifications are off.` The app reads that permission again on launch. A ring that could not be posted because permission is off is not stored, so granting notifications later can still announce a plane that is inside the ring. The 8 second gap still stores the ring.
 
 Watch with no stored place does not start the service. The status line stays `Set a location to watch the sky`.
 

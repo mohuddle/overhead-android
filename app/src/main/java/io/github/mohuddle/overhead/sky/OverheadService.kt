@@ -19,6 +19,7 @@ import io.github.mohuddle.overhead.OverheadApp
 import io.github.mohuddle.overhead.Palette
 import io.github.mohuddle.overhead.R
 import io.github.mohuddle.overhead.domain.AlertEvent
+import io.github.mohuddle.overhead.domain.POLL_INTERVAL_MS
 import io.github.mohuddle.overhead.domain.bodyFor
 import io.github.mohuddle.overhead.domain.fetchWith
 import io.github.mohuddle.overhead.domain.shouldKeepPoll
@@ -34,7 +35,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-private const val POLL_MS = 12_000L
 private const val WATCH_NOTIFICATION_ID = 1
 private const val ALERT_NOTIFICATION_ID = 2
 
@@ -105,7 +105,7 @@ class OverheadService : LifecycleService() {
             when (step) {
                 Tick.Stop -> break
                 Tick.Retry -> Unit
-                Tick.Continue -> delay(POLL_MS)
+                Tick.Continue -> delay(POLL_INTERVAL_MS)
             }
         }
         stopSelf()

@@ -14,7 +14,7 @@ does not scrape the globe site. A globe link is opened only from a listed
 row or a single-plane notification, and the only identifier in that URL is
 the aircraft hex.
 
-Please treat the feeds gently (this watcher polls about once every 12 seconds)
+Please treat the feeds gently (this watcher polls about once every 30 seconds)
 and consider running a receiver if you use the data regularly.
 
 ## App icon

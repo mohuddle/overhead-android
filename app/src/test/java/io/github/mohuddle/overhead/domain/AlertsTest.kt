@@ -25,7 +25,7 @@ class AlertsTest {
         assertEquals(emptyList<AlertEvent>(), gone)
         val (back, _) = newAlerts(cleared, listOf(plane.copy(miles = 8.0)), rings)
         assertEquals(10, back[0].ring)
-        assertEquals("UAL1 (B738) is 8.0 mi away, 3,000 ft.", bodyFor(back[0]))
+        assertEquals("UAL1 (B738) is 8.0 mi N away, 3,000 ft.", bodyFor(back[0]))
     }
 
     @Test fun alertableSkipsLowAndGround() {
@@ -57,6 +57,12 @@ class AlertsTest {
     @Test fun bodyIncludesSpeed() {
         val text = bodyFor(event(gsKt = 288.1))
         assertTrue(text.contains("288 kt"))
+    }
+
+    @Test fun bodyUsesTheBearingOfThePlane() {
+        val plane = sample().copy(bearing = 225.0, miles = 4.7)
+        val (events, _) = newAlerts(emptyMap(), listOf(plane), rings)
+        assertEquals("UAL1 (B738) is 4.7 mi SW away, 3,000 ft.", bodyFor(events[0]))
     }
 
     private fun sample(

@@ -22,11 +22,12 @@ class PresentTest {
         assertEquals(emptyList<PlaneRow>(), state.rows)
         assertNull(state.caption)
         assertEquals("Watch", state.watchLabel)
-        assertEquals("Notify on", state.notifyLabel)
+        assertEquals("Turn alerts off", state.notifyLabel)
+        assertTrue(state.notifyOn)
     }
 
     @Test fun watchingShowsTheNearestPlane() {
-        val plane = aircraft(callsign = "UAL2373", miles = 0.8, ring = 1, hex = "a5d28c")
+        val plane = aircraft(callsign = "UAL2373", miles = 0.8, ring = 1, hex = "a5d28c", bearing = 45.0)
         val state = present(
             input(
                 place = fayetteville,
@@ -37,7 +38,8 @@ class PresentTest {
                 timeLabel = "3:04 PM",
             ),
         )
-        assertEquals("UAL2373 · 0.8 mi", state.statusLine)
+        assertEquals("UAL2373 · 0.8 mi NE", state.statusLine)
+        assertEquals("0.8 mi NE  UAL2373  B738  3,000 ft", state.rows.single().line)
         assertTrue(state.statusAccent)
         assertEquals("Watching", state.badge)
         assertEquals("Fayetteville · adsb.fi", state.placeLine)
@@ -59,6 +61,12 @@ class PresentTest {
         assertEquals("ADS-B feeds failed (adsb.fi: down)", state.statusLine)
         assertFalse(state.statusAccent)
         assertEquals("No aircraft in range.", state.emptyCopy)
+    }
+
+    @Test fun notifyOffNamesTheAction() {
+        val state = present(input(notify = false))
+        assertEquals("Turn alerts on", state.notifyLabel)
+        assertFalse(state.notifyOn)
     }
 
     @Test fun deniedNotificationsStayOffTheStatusLine() {
@@ -126,6 +134,7 @@ class PresentTest {
         callsign: String = "N1",
         miles: Double = 0.8,
         ring: Int? = 1,
+        bearing: Double = 0.0,
     ) = Aircraft(
         hex = hex,
         callsign = callsign,
@@ -139,7 +148,7 @@ class PresentTest {
         gsKt = null,
         track = null,
         miles = miles,
-        bearing = 0.0,
+        bearing = bearing,
         ring = ring,
         seen = 1.0,
     )

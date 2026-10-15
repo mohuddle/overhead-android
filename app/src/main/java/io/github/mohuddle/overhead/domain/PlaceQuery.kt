@@ -7,7 +7,7 @@ import java.net.URLEncoder
 import java.util.Locale
 
 const val USER_AGENT =
-    "overhead-android/0.1.0 (personal ADS-B watcher; https://github.com/mohuddle/overhead-android)"
+    "overhead-android/0.2.0 (personal ADS-B watcher; https://github.com/mohuddle/overhead-android)"
 
 data class Place(
     val lat: Double,

@@ -118,7 +118,7 @@ fun globeUrl(hex: String): String {
 }
 
 fun aircraftLine(item: Aircraft): String {
-    val bits = mutableListOf(formatMiles(item.miles), item.callsign)
+    val bits = mutableListOf("${formatMiles(item.miles)} ${compassPoint(item.bearing)}", item.callsign)
     if (item.type.isNotBlank()) bits += item.type
     val alt = formatAlt(item.altFt, item.ground)
     if (alt.isNotBlank()) bits += alt
@@ -129,7 +129,7 @@ fun nearestLine(hasLocation: Boolean, nearest: Aircraft?): String {
     if (nearest == null) {
         return if (hasLocation) "No aircraft in range" else "Set a location to watch the sky"
     }
-    return "${nearest.callsign} · ${formatMiles(nearest.miles)}"
+    return "${nearest.callsign} · ${formatMiles(nearest.miles)} ${compassPoint(nearest.bearing)}"
 }
 
 private fun callsign(vararg parts: Any?): String {

@@ -14,6 +14,7 @@ data class AlertEvent(
     val altFt: Int?,
     val ground: Boolean,
     val gsKt: Double?,
+    val bearing: Double = 0.0,
     val extra: Int = 0,
 )
 
@@ -48,6 +49,7 @@ fun newAlerts(
             altFt = item.altFt,
             ground = item.ground,
             gsKt = item.gsKt,
+            bearing = item.bearing,
         )
     }
     events.sortWith(compareBy({ it.ring }, { it.miles }))
@@ -72,7 +74,7 @@ fun titleFor(event: AlertEvent): String {
 fun bodyFor(event: AlertEvent): String {
     val callsign = event.callsign.ifBlank { event.hex.ifBlank { "Aircraft" } }
     val label = if (event.type.isNotBlank()) "$callsign (${event.type})" else callsign
-    val parts = mutableListOf("$label is ${formatMiles(event.miles)} away")
+    val parts = mutableListOf("$label is ${formatMiles(event.miles)} ${compassPoint(event.bearing)} away")
     val alt = formatAlt(event.altFt, event.ground)
     if (alt.isNotEmpty()) parts += alt
     event.gsKt?.let { speed ->

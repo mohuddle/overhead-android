@@ -36,7 +36,7 @@ class AircraftTest {
         assertEquals(0.08, plane.miles, 0.0)
         assertFalse(plane.ground)
         assertEquals("https://globe.adsbexchange.com/?icao=a5d28c", globeUrl(plane.hex))
-        assertEquals("0.1 mi  UAL2373  B39M  4,200 ft", aircraftLine(plane))
+        assertEquals("0.1 mi NE  UAL2373  B39M  4,200 ft", aircraftLine(plane))
     }
 
     @Test fun groundAltitudeWord() {
