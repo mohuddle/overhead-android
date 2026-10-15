@@ -130,7 +130,7 @@ Channels:
 
 The ongoing notice is titled `Overhead is watching`. Tapping it opens the app. Dismissing it sets Watch off and stops the service. Tapping a single-plane alert opens that plane's globe URL. Tapping a grouped alert opens the app.
 
-`POST_NOTIFICATIONS` is requested when the user turns Watch on, or turns Notify on. If they deny it, Watch still runs, ring toasts are skipped, and a line under the Notify control says `Notifications are off.`
+`POST_NOTIFICATIONS` is requested when the user turns Watch on, or turns Notify on. If they deny it, Watch still runs, ring toasts are skipped, and a line under the Notify control says `Notifications are off.` The app reads that permission again on launch. A ring that could not be posted because permission is off is not stored, so granting notifications later can still announce a plane that is inside the ring. The 8 second gap still stores the ring.
 
 Watch with no stored place does not start the service. The status line stays `Set a location to watch the sky`.
 
@@ -179,4 +179,4 @@ The stored place stays in the app's DataStore. A poll sends that lat/lon and a r
 
 ## Status
 
-v1 of this spec is implemented. The slice order was scaffold and theme, domain plus the tests above, DataStore, the screen against a fake status, geocoding and feeds, the foreground service and notifications, the Device fix, boot resume, then the launcher, `NOTICE.md`, and `README.md`. The working notes for that order are in `docs/superpowers/plans/2026-10-14-overhead-android.md`.
+v1 of this spec is implemented. The slice order was scaffold and theme, domain plus the tests above, DataStore, the screen against a fake status, geocoding and feeds, the foreground service and notifications, the Device fix, boot resume, then the launcher, `NOTICE.md`, and `README.md`. The working notes for that order are in `docs/superpowers/plans/2026-10-14-overhead-android.md`. That file is a build log. It still names the machine paths used while writing it. The README is the build guide.

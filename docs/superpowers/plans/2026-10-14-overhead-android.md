@@ -1,5 +1,7 @@
 # Overhead Android Implementation Plan
 
+Historical log from 2026-10-14. The app this plan describes is already built. Behavior for people using or building it is in [README.md](../../../README.md) and [DESIGN.md](../../../DESIGN.md). Paths under `/home/anon` below are the machine that wrote the plan, not setup steps for anyone else.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Ship a sideload Overhead app that lists nearby ADS-B traffic for a typed place, alerts on the 1 / 5 / 10 mile rings while Watch is on, and opens a plane on the ADS-B Exchange globe.

@@ -85,7 +85,7 @@ Ground aircraft, and aircraft under 500 ft, stay on the list and do not alert. M
 
 Notify off still updates the list and the memory of which rings have already fired. It does not post ring toasts.
 
-At most one ring toast per poll, and not sooner than 8 seconds after the previous one. Several aircraft in one poll collapse into one toast: the closest is named, and the title counts the rest.
+At most one ring toast per poll, and not sooner than 8 seconds after the previous one. A ring skipped only because of that gap is stored, so it does not toast again when the gap ends. Several aircraft in one poll collapse into one toast: the closest is named, and the title counts the rest.
 
 | Situation | Title |
 | --- | --- |
@@ -102,7 +102,7 @@ The body names the callsign, type, distance, altitude, and speed when those exis
 | `overhead-5` | default | 5 mile ring |
 | `overhead-10` | low | 10 mile ring |
 
-Notification permission is requested when you turn Watch on or turn Notify on. If you deny it, Watch still runs, ring toasts are skipped, and **Notify** shows `Notifications are off.` Those crossings are kept until a toast can actually be posted, so granting notification permission later can still announce a plane that is inside a ring.
+Notification permission is requested when you turn Watch on or turn Notify on. If you deny it, Watch still runs, ring toasts are skipped, and **Notify** shows `Notifications are off.` The app reads that permission again on launch. A ring that could not be posted because permission is off is not stored, so granting notifications later can still announce a plane that is inside a ring. Turning Notify off is different: the ring is stored, and turning Notify back on does not announce a plane that is still inside it.
 
 ## Permissions
 
@@ -126,9 +126,11 @@ Android backup is left at the platform default, so a device backup can include t
 
 ## Build and install
 
-JDK 17 or newer, and an Android SDK with platform 36. Point Gradle at the SDK with `ANDROID_HOME` or `sdk.dir` in `local.properties`.
+JDK 17 or newer, and an Android SDK with platform 36. Point Gradle at the SDK with `ANDROID_HOME` or `sdk.dir` in `local.properties` (that file stays untracked).
 
 ```bash
+git clone https://github.com/mohuddle/overhead-android.git
+cd overhead-android
 ./gradlew :app:assembleDebug
 ./gradlew :app:testDebugUnitTest
 adb install -r app/build/outputs/apk/debug/app-debug.apk
