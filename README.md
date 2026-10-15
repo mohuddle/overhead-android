@@ -1,6 +1,6 @@
 # Overhead
 
-![Overhead icon](branding/overhead-icon.svg)
+![Overhead icon](branding/overhead-icon-vibrant.svg)
 
 > A [Mobitecture](https://github.com/mohuddle) app · *apps, architected.*
 
@@ -156,7 +156,7 @@ The debug APK is signed with the local debug key. There is no release signing co
 | Service | `sky/OverheadService.kt`, poll every 12 seconds |
 | Desktop oracle | plugin `overhead/*.py`, `Model.js`, and their tests |
 
-Ink `#12141B`, limestone `#F4F2ED`, copper `#EE9A5B` / `#D9783A`, sky `#2F6FE4`. Titles are Geist, counts are Geist Mono, body is Inter. The launcher is a sky squircle with the Cessna silhouette from [adsb-radar.com](https://adsb-radar.com/help/icons/cessna.svg).
+Ink `#12141B`, limestone `#F4F2ED`, copper `#EE9A5B` / `#D9783A`, sky `#2F6FE4`. Titles are Geist, counts are Geist Mono, body is Inter. The launcher is the same Mobitecture mark as the desktop repo: a sky squircle, the side-view plane, and a copper wing light (`branding/overhead-icon-vibrant.svg`).
 
 ## Not in v1
 
@@ -164,7 +164,7 @@ An in-app map, a WebView of the globe, continuous GPS, background location, a gr
 
 ## License
 
-MIT. See [LICENSE](LICENSE). Feeds, the Cessna glyph, and the font licenses are in [NOTICE.md](NOTICE.md).
+MIT. See [LICENSE](LICENSE). Feeds, the icon, and the font licenses are in [NOTICE.md](NOTICE.md).
 
 ---
 

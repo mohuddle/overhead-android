@@ -17,11 +17,17 @@ the aircraft hex.
 Please treat the feeds gently (this watcher polls about once every 12 seconds)
 and consider running a receiver if you use the data regularly.
 
-## Cessna icon
+## App icon
 
-The launcher and notification glyph is the Cessna silhouette published at
+The phone launcher is the Mobitecture Overhead mark, the same artwork as
+[omarchy-overhead](https://github.com/mohuddle/omarchy-overhead)
+`branding/overhead-icon-vibrant.svg`. The source in this repo is
+`branding/overhead-icon-vibrant.svg`, with adaptive layers in
+`branding/android/`.
+
+`branding/icon.svg` is the Cessna silhouette published at
 [adsb-radar.com/help/icons/cessna.svg](https://adsb-radar.com/help/icons/cessna.svg).
-The source file in this repo is `branding/icon.svg`.
+The desktop bar uses that glyph. This app's launcher does not.
 
 ## Fonts
 

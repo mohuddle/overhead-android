@@ -51,7 +51,7 @@ Sky is primary. Copper is secondary. The light primary is Sky deep on limestone,
 
 Sky marks the watching badge, the nearest line while watching, and any row inside 1 mile. Selected ring chips use copper. Set uses the primary filled button. Everything else stays ink, limestone, and concrete.
 
-The launcher is a sky squircle with the plugin's Cessna silhouette (`icon.svg`, from [adsb-radar.com/help/icons/cessna.svg](https://adsb-radar.com/help/icons/cessna.svg)). Monochrome layer is the same glyph in white. Materialize it the way ChargeAlert does: SVG in `branding/`, `scripts/materialize_icons.py`, adaptive icon layers. The notification small icon is a white Cessna vector, tinted Sky.
+The launcher is the Mobitecture Overhead mark from the desktop repo (`branding/overhead-icon-vibrant.svg`): a sky squircle, the side-view plane, and a copper wing light. Adaptive layers live in `branding/android/`. `scripts/materialize_icons.py` copies them into the resource tree. The notification small icon is that plane in white, tinted Sky. `branding/icon.svg` is the desktop bar's Cessna and is not the phone launcher.
 
 ## Screen
 
