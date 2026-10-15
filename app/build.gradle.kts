@@ -59,6 +59,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.2")
     implementation("androidx.core:core-ktx:1.16.0")
     implementation("com.google.code.gson:gson:2.11.0")
+    implementation("androidx.datastore:datastore-preferences:1.1.7")
 
     testImplementation("junit:junit:4.13.2")
 }
