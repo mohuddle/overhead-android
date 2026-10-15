@@ -2,6 +2,7 @@ package io.github.mohuddle.overhead.ui
 
 import android.app.Application
 import android.content.Intent
+import android.location.LocationManager
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,10 +14,14 @@ import io.github.mohuddle.overhead.domain.noMatchMessage
 import io.github.mohuddle.overhead.domain.placeFromNominatim
 import io.github.mohuddle.overhead.domain.shouldRunService
 import io.github.mohuddle.overhead.domain.summarizeCounts
+import io.github.mohuddle.overhead.sky.DEVICE_DENIED
+import io.github.mohuddle.overhead.sky.DEVICE_TIMEOUT
 import io.github.mohuddle.overhead.sky.OverheadService
 import io.github.mohuddle.overhead.sky.SkyHolder
+import io.github.mohuddle.overhead.sky.devicePlace
 import io.github.mohuddle.overhead.sky.emptySky
 import io.github.mohuddle.overhead.sky.httpGet
+import io.github.mohuddle.overhead.sky.readDeviceFix
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -127,6 +132,30 @@ class OverheadViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setNotifyDenied(denied: Boolean) {
         notifyDenied.value = denied
+    }
+
+    fun readDevice() {
+        viewModelScope.launch {
+            deviceError.value = null
+            val manager = getApplication<Application>().getSystemService(LocationManager::class.java)
+            val fix = try {
+                withContext(Dispatchers.IO) { readDeviceFix(manager) }
+            } catch (_: SecurityException) {
+                deviceError.value = DEVICE_DENIED
+                return@launch
+            }
+            if (fix == null) {
+                deviceError.value = DEVICE_TIMEOUT
+                return@launch
+            }
+            val accuracy = if (fix.hasAccuracy()) fix.accuracy.toDouble() else null
+            store.setPlace(devicePlace(fix.latitude, fix.longitude, accuracy))
+            syncService()
+        }
+    }
+
+    fun denyDevice() {
+        deviceError.value = DEVICE_DENIED
     }
 
     private suspend fun syncService() {

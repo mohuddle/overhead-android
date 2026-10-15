@@ -29,6 +29,14 @@ class MainActivity : ComponentActivity() {
         model.setNotifyDenied(!granted)
     }
 
+    private val locationPermission = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions(),
+    ) { grants ->
+        val granted = grants[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+            grants[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        if (granted) model.readDevice() else model.denyDevice()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         model = ViewModelProvider(this)[OverheadViewModel::class.java]
@@ -41,7 +49,7 @@ class MainActivity : ComponentActivity() {
                     draft = draft,
                     onDraft = { draft = it },
                     onSet = { model.set(draft) },
-                    onDevice = {},
+                    onDevice = ::askDevice,
                     onWatch = { model.toggleWatch(::askNotifications) },
                     onNotify = { model.toggleNotify(::askNotifications) },
                     onClear = { model.clear() },
@@ -50,6 +58,25 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
+    }
+
+    private fun askDevice() {
+        val fine = granted(Manifest.permission.ACCESS_FINE_LOCATION)
+        val coarse = granted(Manifest.permission.ACCESS_COARSE_LOCATION)
+        if (fine || coarse) {
+            model.readDevice()
+        } else {
+            locationPermission.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                ),
+            )
+        }
+    }
+
+    private fun granted(permission: String): Boolean {
+        return ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun askNotifications() {
